@@ -59,5 +59,49 @@ module.exports = {
     getNationality(db) {
         return db('nationality')
             .select('name', 'nationality', 'nhso_code')
+    },
+    getInfectedCOVID(db, hn) {
+        const sql = `
+        SELECT ( SELECT
+	DATE_FORMAT( lh.order_date, "%Y-%m-%d" ) 
+	FROM
+		lab_head lh
+		JOIN lab_order lo ON lo.lab_order_number = lh.lab_order_number 
+	WHERE
+		lh.hn = '${hn}'
+		AND lo.lab_items_name_ref LIKE "%COVID%" 
+		AND lo.confirm = "Y" 
+		AND ( lo.lab_order_result LIKE "Detect%" OR lo.lab_order_result LIKE "Positive%" ) 
+	GROUP BY
+		lh.order_date 
+	ORDER BY
+		lh.order_date DESC 
+		LIMIT 1 
+	) AS InfectedDate,
+	(
+	SELECT
+		CONCAT(
+			"ตรวจหาเชื้อ COVID-19 ครั้งสุดท้ายเมื่อ ",
+			DATE_FORMAT( lh.order_date, "%d/%m/" ),
+			YEAR ( lh.order_date )+ 543,
+			" ผล : ",
+		GROUP_CONCAT( CONCAT( lo.lab_items_name_ref, " => ", lo.lab_order_result ) SEPARATOR " ผล : " )) 
+	FROM
+		lab_head lh
+		JOIN lab_order lo ON lo.lab_order_number = lh.lab_order_number 
+	WHERE
+		lh.hn = '${hn}' 
+		AND lo.lab_items_name_ref LIKE "%COVID%" 
+		AND lo.confirm = "Y" 
+	GROUP BY
+		lh.order_date 
+	ORDER BY
+		lh.order_date DESC 
+		LIMIT 1 
+	) AS LabResult,
+	( SELECT ov.vstdate FROM patient_covid19_hi hi JOIN ovst ov ON ov.vn = hi.vn WHERE hi.hn = '${hn}' ) AS IsolationDate,
+	( SELECT GROUP_CONCAT( ov.vstdate ) FROM ovst ov WHERE ov.hn = '${hn}' AND ov.main_dep = "152" ) AS OPSI_Date
+        `;
+        return db.raw(sql)
     }
 };

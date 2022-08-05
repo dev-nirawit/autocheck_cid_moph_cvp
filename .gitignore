@@ -2,3 +2,5 @@
 log.log
 error_log.log
 *node_modules/*
+no_log_vaccine_name.json
+config_map_vaccine.json

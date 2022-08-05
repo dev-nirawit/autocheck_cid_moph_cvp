@@ -1,0 +1,7 @@
+{
+    "verbose": true,
+    "watch": ["index.js"],
+    "exec": "node index.js",
+    "pollingInterval": 100,
+    "legacyWatch": true
+}

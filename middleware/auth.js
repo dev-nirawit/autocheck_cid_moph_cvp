@@ -6,6 +6,8 @@ const verifyToken = (req, res, next) => {
     const token =
         req.body.token || req.query.token || req.headers["auth-token"];
 
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    console.log("your IP is: " + ip);
     if (!token) {
         return res.status(403).send({
             ok: false,
