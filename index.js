@@ -358,7 +358,7 @@ app.get("/check-cvp-moph-todb/:cid", auth, async(req, res) => {
                     Message: `ไม่พบข้อมูลการได้รับวัคซีน CID นี้`
                 });
                 // res.send({ data_rs: data_rs, api_data: error.response.data });
-                res.send({ data_rs: data_rs, api_data: error.response.data });
+                res.send({ data_rs: data_rs, api_data: error });
             });
     } catch (error) {
         // Handle Error Here
@@ -693,11 +693,8 @@ async function runJob() {
             // checkImmunizationHistoryCID('1200900099000') //TEST DEBUG
     }, 100);
 }
-runJob();
+// runJob();
 
-let t1 = 'd.' + process.env.COLUMN_TABLE;
-
-console.log(t1);
 
 // console.log(shortNameVaccine("Johnson & Johnson"));
 
